@@ -110,6 +110,10 @@ final class BetterPlayer {
         this.eventChannel = eventChannel;
         this.textureEntry = textureEntry;
         trackSelector = new DefaultTrackSelector(context);
+        playerView = new PlayerView(context);
+        adsLoader = new ImaAdsLoader(context, Uri.parse("https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator="));
+
+
         exoPlayer = new SimpleExoPlayer.Builder(context).setTrackSelector(trackSelector).build();
 
         setupVideoPlayer(eventChannel, textureEntry, result);
@@ -123,12 +127,6 @@ final class BetterPlayer {
         isInitialized = false;
 
 
-        playerView = new PlayerView(context);
-        adsLoader = new ImaAdsLoader(context, Uri.parse("https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator="));
-
-        playerView.setPlayer(exoPlayer);
-
-        adsLoader.setPlayer(exoPlayer);
 
 
         Uri uri = Uri.parse(dataSource);
@@ -157,23 +155,38 @@ final class BetterPlayer {
             dataSourceFactory = new DefaultDataSourceFactory(context, "ExoPlayer");
         }
 
-        MediaSource mediaSource = buildMediaSource(uri, dataSourceFactory, formatHint, context);
-        if (overriddenDuration != 0) {
-            ClippingMediaSource clippingMediaSource = new ClippingMediaSource(mediaSource, 0, overriddenDuration * 1000);
-            mediaSource = (clippingMediaSource);
-        }
-
+//        MediaSource mediaSource = buildMediaSource(uri, dataSourceFactory, formatHint, context);
+//        if (overriddenDuration != 0) {
+//            ClippingMediaSource clippingMediaSource = new ClippingMediaSource(mediaSource, 0, overriddenDuration * 1000);
+//            mediaSource = (clippingMediaSource);
+//        }
+//
+//        ProgressiveMediaSource.Factory mediaSourceFactory =
+//                new ProgressiveMediaSource.Factory(dataSourceFactory);
+//
+//
+//        // Create the AdsMediaSource using the AdsLoader and the MediaSource.
+//        AdsMediaSource adsMediaSource =
+//                new AdsMediaSource(mediaSource, dataSourceFactory, adsLoader, playerView);
+//
         ProgressiveMediaSource.Factory mediaSourceFactory =
                 new ProgressiveMediaSource.Factory(dataSourceFactory);
 
+        MediaSource mediaSource =
+                mediaSourceFactory.createMediaSource(Uri.parse("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"));
 
         // Create the AdsMediaSource using the AdsLoader and the MediaSource.
         AdsMediaSource adsMediaSource =
                 new AdsMediaSource(mediaSource, dataSourceFactory, adsLoader, playerView);
 
+        // Prepare the content and ad to be played with the SimpleExoPlayer.
+//        player.prepare(adsMediaSource);
 
+//        mPlayerView.prepare(withSubtitles(dataSourceFactory, videoSource));
 
         exoPlayer.prepare(adsMediaSource);
+
+//        exoPlayer.prepare(adsMediaSource);
 
         result.success(null);
     }
@@ -457,6 +470,14 @@ final class BetterPlayer {
 
     private void setupVideoPlayer(
             EventChannel eventChannel, TextureRegistry.SurfaceTextureEntry textureEntry, Result result) {
+
+
+
+        playerView.setPlayer(exoPlayer);
+
+        adsLoader.setPlayer(exoPlayer);
+
+
 
         eventChannel.setStreamHandler(
                 new EventChannel.StreamHandler() {
