@@ -31,18 +31,21 @@ import com.google.android.exoplayer2.Player.EventListener;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.audio.AudioAttributes;
+import com.google.android.exoplayer2.ext.ima.ImaAdsLoader;
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ClippingMediaSource;
 import com.google.android.exoplayer2.source.ClippingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.source.ads.AdsMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
@@ -96,6 +99,9 @@ final class BetterPlayer {
     private MediaSessionCompat mediaSession;
 
 
+    private PlayerView playerView;
+    private ImaAdsLoader adsLoader;
+
     BetterPlayer(
             Context context,
             EventChannel eventChannel,
@@ -115,6 +121,15 @@ final class BetterPlayer {
             long overriddenDuration) {
         this.key = key;
         isInitialized = false;
+
+
+        playerView = new PlayerView(context);
+        adsLoader = new ImaAdsLoader(context, Uri.parse("https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator="));
+
+        playerView.setPlayer(exoPlayer);
+
+        adsLoader.setPlayer(exoPlayer);
+
 
         Uri uri = Uri.parse(dataSource);
         DataSource.Factory dataSourceFactory;
@@ -145,11 +160,20 @@ final class BetterPlayer {
         MediaSource mediaSource = buildMediaSource(uri, dataSourceFactory, formatHint, context);
         if (overriddenDuration != 0) {
             ClippingMediaSource clippingMediaSource = new ClippingMediaSource(mediaSource, 0, overriddenDuration * 1000);
-            exoPlayer.setMediaSource(clippingMediaSource);
-        } else {
-            exoPlayer.setMediaSource(mediaSource);
+            mediaSource = (clippingMediaSource);
         }
-        exoPlayer.prepare();
+
+        ProgressiveMediaSource.Factory mediaSourceFactory =
+                new ProgressiveMediaSource.Factory(dataSourceFactory);
+
+
+        // Create the AdsMediaSource using the AdsLoader and the MediaSource.
+        AdsMediaSource adsMediaSource =
+                new AdsMediaSource(mediaSource, dataSourceFactory, adsLoader, playerView);
+
+
+
+        exoPlayer.prepare(adsMediaSource);
 
         result.success(null);
     }
