@@ -43,7 +43,7 @@ android {
         implementation 'com.google.android.exoplayer:exoplayer-hls:2.11.1'
         implementation 'com.google.android.exoplayer:exoplayer-dash:2.11.1'
         implementation 'com.google.android.exoplayer:extension-ima:2.11.1'
-        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.2.11.1'
+        implementation 'com.google.android.exoplayer:exoplayer-smoothstreaming:2.11.1'
         implementation 'com.google.android.exoplayer:exoplayer-ui:2.11.1'
         implementation 'com.google.android.exoplayer:extension-mediasession:2.11.1'
         implementation "android.arch.lifecycle:runtime:1.1.1"
