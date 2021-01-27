@@ -694,7 +694,7 @@ class BetterPlayerController extends ChangeNotifier {
         _wasInFullScreenBeforePiP = _isFullScreen;
         await videoPlayerController.enablePictureInPicture(
             left: 0, top: 0, width: 0, height: 0);
-        enterFullScreen();
+        // enterFullScreen();
         _postEvent(BetterPlayerEvent(BetterPlayerEventType.pipStart));
         return;
       }
