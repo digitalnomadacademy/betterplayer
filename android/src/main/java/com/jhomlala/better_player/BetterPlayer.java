@@ -126,9 +126,6 @@ final class BetterPlayer {
         this.key = key;
         isInitialized = false;
 
-
-
-
         Uri uri = Uri.parse(dataSource);
         DataSource.Factory dataSourceFactory;
 
@@ -155,41 +152,89 @@ final class BetterPlayer {
             dataSourceFactory = new DefaultDataSourceFactory(context, "ExoPlayer");
         }
 
-//        MediaSource mediaSource = buildMediaSource(uri, dataSourceFactory, formatHint, context);
-//        if (overriddenDuration != 0) {
-//            ClippingMediaSource clippingMediaSource = new ClippingMediaSource(mediaSource, 0, overriddenDuration * 1000);
-//            mediaSource = (clippingMediaSource);
+        MediaSource mediaSource = buildMediaSource(uri, dataSourceFactory, formatHint, context);
+        if (overriddenDuration != 0) {
+            ClippingMediaSource clippingMediaSource = new ClippingMediaSource(mediaSource, 0, overriddenDuration * 1000);
+            exoPlayer.setMediaSource(clippingMediaSource);
+        } else {
+            exoPlayer.setMediaSource(mediaSource);
+        }
+        exoPlayer.prepare();
+
+        result.success(null);
+    }
+
+//    void setDataSource(
+//            Context context, String key, String dataSource, String formatHint, Result result,
+//            Map<String, String> headers, boolean useCache, long maxCacheSize, long maxCacheFileSize,
+//            long overriddenDuration) {
+//        this.key = key;
+//        isInitialized = false;
+//
+//
+//
+//
+//        Uri uri = Uri.parse(dataSource);
+//        DataSource.Factory dataSourceFactory;
+//
+//        if (isHTTP(uri)) {
+//            DefaultHttpDataSourceFactory defaultHttpDataSourceFactory =
+//                    new DefaultHttpDataSourceFactory(
+//                            "ExoPlayer",
+//                            null,
+//                            DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS,
+//                            DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS,
+//                            true);
+//            if (headers != null) {
+//                defaultHttpDataSourceFactory.getDefaultRequestProperties().set(headers);
+//            }
+//
+//            if (useCache && maxCacheSize > 0 && maxCacheFileSize > 0) {
+//                dataSourceFactory =
+//                        new CacheDataSourceFactory(context, maxCacheSize, maxCacheFileSize, defaultHttpDataSourceFactory);
+//            } else {
+//                dataSourceFactory = defaultHttpDataSourceFactory;
+//            }
+//        } else {
+//
+//            dataSourceFactory = new DefaultDataSourceFactory(context, "ExoPlayer");
 //        }
 //
+////        MediaSource mediaSource = buildMediaSource(uri, dataSourceFactory, formatHint, context);
+////        if (overriddenDuration != 0) {
+////            ClippingMediaSource clippingMediaSource = new ClippingMediaSource(mediaSource, 0, overriddenDuration * 1000);
+////            mediaSource = (clippingMediaSource);
+////        }
+////
+////        ProgressiveMediaSource.Factory mediaSourceFactory =
+////                new ProgressiveMediaSource.Factory(dataSourceFactory);
+////
+////
+////        // Create the AdsMediaSource using the AdsLoader and the MediaSource.
+////        AdsMediaSource adsMediaSource =
+////                new AdsMediaSource(mediaSource, dataSourceFactory, adsLoader, playerView);
+////
 //        ProgressiveMediaSource.Factory mediaSourceFactory =
 //                new ProgressiveMediaSource.Factory(dataSourceFactory);
 //
+//        MediaSource mediaSource =
+//                mediaSourceFactory.createMediaSource(Uri.parse("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"));
 //
 //        // Create the AdsMediaSource using the AdsLoader and the MediaSource.
 //        AdsMediaSource adsMediaSource =
 //                new AdsMediaSource(mediaSource, dataSourceFactory, adsLoader, playerView);
 //
-        ProgressiveMediaSource.Factory mediaSourceFactory =
-                new ProgressiveMediaSource.Factory(dataSourceFactory);
-
-        MediaSource mediaSource =
-                mediaSourceFactory.createMediaSource(Uri.parse("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"));
-
-        // Create the AdsMediaSource using the AdsLoader and the MediaSource.
-        AdsMediaSource adsMediaSource =
-                new AdsMediaSource(mediaSource, dataSourceFactory, adsLoader, playerView);
-
-        // Prepare the content and ad to be played with the SimpleExoPlayer.
-//        player.prepare(adsMediaSource);
-
-//        mPlayerView.prepare(withSubtitles(dataSourceFactory, videoSource));
-
-        exoPlayer.prepare(adsMediaSource);
-
+//        // Prepare the content and ad to be played with the SimpleExoPlayer.
+////        player.prepare(adsMediaSource);
+//
+////        mPlayerView.prepare(withSubtitles(dataSourceFactory, videoSource));
+//
 //        exoPlayer.prepare(adsMediaSource);
-
-        result.success(null);
-    }
+//
+////        exoPlayer.prepare(adsMediaSource);
+//
+//        result.success(null);
+//    }
 
     public void setupPlayerNotification(Context context, String title, String author, String imageUrl, String notificationChannelName) {
 
